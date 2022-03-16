@@ -1,0 +1,806 @@
+Extension methods:
+Extension methods are written by using static class & methods
+
+namespace ConsoleApp1
+{
+    static class example
+    {
+        public static void method3(this Demo obj, string uname)
+        {
+            Console.WriteLine("welcome=" + uname);
+        }
+
+        public static void method4(this Demo obj, string fname, string lname)
+        {
+            Console.WriteLine($"{fname}.{lname}@gmail.com");
+        }
+    }
+    class Demo
+    {
+        public void method1()
+        {
+            Console.WriteLine("first method");
+        }
+        public void method2()
+        {
+            Console.WriteLine("second method");
+        }
+    }
+    
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Demo obj = new Demo();
+            obj.method1();
+            obj.method2();
+            obj.method3("john");
+            obj.method4("ajay", "rao");
+        }
+    }
+}
+
+Multithreading:
+
+Thread->it is an independent execution path,these paths can run simulaneously with
+other threads.
+
+using System.Threading;
+
+Thread--->class
+ThreadStart->Delegate
+Sleep(time)
+
+namespace ConsoleApp1
+{
+    class Demo
+    {
+       public void function1()
+        {
+            for(int i=0; i<5;i++)
+            {
+                Console.WriteLine(i);
+            }
+        }
+    }
+    
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Demo obj = new Demo();
+            Thread th1 = new Thread(new ThreadStart(obj.function1));
+            th1.Start();
+        }
+    }
+}
+
+namespace ConsoleApp1
+{
+    class Demo
+    {
+       public void function1()
+        {
+            for(int i=0; i<5;i++)
+            {
+                Console.WriteLine(i);
+                Thread.Sleep(2000);
+            }
+        }
+    }
+    
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Demo obj = new Demo();
+            Thread th1 = new Thread(new ThreadStart(obj.function1));
+            th1.Start();
+
+            Thread th2 = new Thread(new ThreadStart(obj.function1));
+            th2.Start();
+
+            Thread th3 = new Thread(new ThreadStart(obj.function1));
+            th3.Start();
+        }
+    }
+}
+
+
+Lock in thread(thread synchronization)
+
+synchronization technique allows only one thread to access the resource.
+no other thread are allowed to interrupt,until the specified task is completed by thread
+threads share the resource and executes asynchronously.(deposits and withdrawls)
+
+namespace ConsoleApp1
+{
+    class Demo
+    {
+       public void function1()
+        {
+            lock(this)
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    Console.WriteLine(i);
+                    Thread.Sleep(2000);
+                }
+            }
+        }
+    }
+    
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Demo obj = new Demo();
+            Thread th1 = new Thread(new ThreadStart(obj.function1));
+            th1.Start();
+
+            Thread th2 = new Thread(new ThreadStart(obj.function1));
+            th2.Start();
+
+            Thread th3 = new Thread(new ThreadStart(obj.function1));
+            th3.Start();
+        }
+    }
+}
+
+ThreadPool:
+
+It is collection/group of preconfigured threads which handles the n'number of
+requests which are coming-in.
+"ThreadPool" class is available under using System.Threading namespace.
+ThreadPool class increases the reponsiveness of application.
+
+namespace ConsoleApp1
+{
+    class Demo
+    {
+       public void function1(object threadno)
+        {
+            string tname = "Thread=" + threadno.ToString();
+                for (int i = 0; i < 10; i++)
+                {
+                    Console.WriteLine(tname+":"+i);
+                 
+                }
+        }
+    }
+    
+    class Program
+    {
+        static void Main(string[] args)
+        {
+               Demo obj = new Demo();
+               for(int task=1;task<5;task++)
+                {
+                  ThreadPool.QueueUserWorkItem(new WaitCallback(obj.function1),task);
+                  Thread.Sleep(2000);
+               }
+        }
+    }
+} 
+
+
+Tight coupling and Loose coupling(Dependency Injection,interface)
+
+
+namespace ConsoleApp1
+{
+    class Demo //dev
+    {
+        public void add()
+        {
+            Console.WriteLine("add method");
+        }
+        public void diff()
+        {
+            Console.WriteLine("substract method");
+        }
+        public void square()
+        {
+            Console.WriteLine("square method");
+        }
+        public void area()
+        {
+            Console.WriteLine("area method");
+        }
+    }
+    class DependencyInj //client
+    {
+         Demo obj = new Demo();
+         public void compute()
+        {
+            obj.add();
+            obj.diff();
+            obj.square();
+            obj.area();
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            DependencyInj d1 = new DependencyInj();
+            d1.compute();
+        }
+    }
+} 
+
+namespace ConsoleApp1
+{
+    interface Icalculator
+    {
+        void calculate();
+    }
+    class Add : Icalculator
+    {
+        public void calculate()
+        {
+            Console.WriteLine("sum");
+        }
+    }
+    class Sub : Icalculator
+    {
+        public void calculate()
+        {
+            Console.WriteLine("diff");
+        }
+    }
+
+    class Square : Icalculator
+    {
+        public void calculate()
+        {
+            Console.WriteLine("square");
+        }
+    }
+
+    class Cube : Icalculator
+    {
+        public void calculate()
+        {
+            Console.WriteLine("Cube");
+        }
+    }
+    class DependencyInj //client
+    {
+        Icalculator objcal = null;
+        public DependencyInj(Icalculator obj) //Dependency Inj
+        {
+            objcal = obj;
+        }
+        public void compute()
+        {
+            objcal.calculate();
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            DependencyInj d1 = new DependencyInj(new Add());
+            d1.compute();
+
+            DependencyInj d2 = new DependencyInj(new Sub());
+            d2.compute();
+
+            DependencyInj d3 = new DependencyInj(new Square());
+            d3.compute();
+
+            DependencyInj d4 = new DependencyInj(new Cube());
+            d4.compute();
+
+        }
+    }
+} 
+
+
+Generic Delegates:func,action,predicate
+
+1.function delegate --->accepts input parameter and output parameter(return)
+
+func<int,int,int> 
+func<int,int,string> 
+
+2.Action delegate-->accepts input parameter and no output parameter(return type)
+
+
+3.Predicate delegate-->accepts string i/p parameter and return bool value.
+
+
+namespace ConsoleApp1
+{  
+    class Sample 
+    {
+        public static int addition(int a,int b)
+        {
+            return (a + b);
+        }
+
+        public static string function1(string x,string y,string z)
+        {
+            return string.Concat(x, y,z);
+        }
+    }
+    
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Func<int, int, int> res1 = new Func<int, int, int>(Sample.addition);
+            Console.WriteLine("Sum=" +res1(10, 20));
+
+            Func<string, string, string, string> res2 = new Func<string, string, string, string>(Sample.function1);
+            Console.WriteLine("NEW STRING IS=" + res2("MODEL-", "VIEW", "-CONTROLLER"));
+        }
+    }
+} 
+
+Action Delegate:
+
+
+namespace ConsoleApp1
+{  
+    class Sample 
+    {
+        public static void print1()
+        {
+            Console.WriteLine("welcome");
+        }
+
+        public static void print2(string x,string y)
+        {
+            Console.WriteLine("new string is="+string.Concat(x, y));
+        }
+
+        public static void print3(int svalue,int evalue)
+        {
+            for(int i=svalue;i<=evalue;i++)
+            {
+                Console.WriteLine(i);
+            }
+        }
+    }
+    
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Action a1 = new Action(Sample.print1);
+            a1();
+
+            Action<string, string> a2 = new Action<string, string>(Sample.print2);
+            a2("NEW", "YORK");
+
+            Action<int, int> a3 = new Action<int, int>(Sample.print3);
+            a3(1,10);
+        }
+    }
+} 
+
+
+Predicate delegate:
+namespace ConsoleApp1
+{  
+    class Sample 
+    {
+        public static bool print1(string str)
+        {
+            return str.StartsWith('a');
+        }
+
+        public static bool print2(string str)
+        {
+            return str.EndsWith('n');
+        }
+    }
+    
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Predicate<string> p1 = new Predicate<string>(Sample.print1);
+            Console.WriteLine(p1("ajay"));
+
+            Predicate<string> p2 = new Predicate<string>(Sample.print2);
+            Console.WriteLine(p2("delhi"));
+        }
+    }
+} 
+
+
+using System.Threading.Tasks
+
+Task Library(TPL)
+
+Task Parallel lib.
+-->Asynchronous programming
+-->"non-blocking" execution of application.
+
+
+
+thread--->parallel execution(simultaneously running mutiple threads).
+synchronous.
+
+namespace ConsoleApp1
+{  
+    //synchronous programming
+    class Sample 
+    {
+       public void print()
+        {
+            Console.WriteLine("function");
+            Thread.Sleep(2000);
+        }
+    }
+    
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("start");
+
+            Sample obj = new Sample();
+            obj.print();
+
+            for(int i=0;i<5;i++)
+            {
+                Console.WriteLine(i);
+            }
+            Console.WriteLine("end");
+        }
+    }
+} 
+
+
+//Asynchronous programming
+    class Sample 
+    {
+       public void print()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                Console.WriteLine(i);
+            }
+        }
+    }
+    
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("start");
+
+            Sample obj = new Sample();
+
+            Task task1 = new Task(obj.print);
+            task1.Start();
+            
+            Console.WriteLine("end");
+        }
+    }
+} 
+
+namespace ConsoleApp1
+{
+    //Asynchronous programming
+    //Lamda Expression () => { }
+    class Sample 
+    {
+       public void print()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                Console.WriteLine(i);
+            }
+        }
+    }
+    
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("start");
+
+            Sample obj = new Sample();
+
+            //Task task1 = new Task(obj.print);
+            //task1.Start();
+
+            // Task task1 = Task.Factory.StartNew(obj.print);
+
+            //  Task task1 = Task.Run(() => { obj.print(); });
+
+            Task task1 = Task.Run(new Action(obj.print));
+            //task1.Wait();
+
+            Console.WriteLine("end");
+
+            Console.ReadKey();
+        }
+    }
+} 
+
+
+namespace ConsoleApp1
+{
+    class Sample 
+    {
+       public int print(int n)
+        {
+            int sum = 0;
+            for (int i = 0; i < n; i++)
+            {
+                sum = sum + i;
+            }
+            return sum;
+        }
+    }
+    
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("start");
+
+            Sample obj = new Sample();
+
+            Task<int> task1 = Task.Run(() =>
+            {
+                return obj.print(5);
+            });
+
+            Console.WriteLine("Result="+task1.Result);
+
+            Console.WriteLine("end");
+            Console.ReadKey();
+        }
+    }
+} 
+
+
+namespace ConsoleApp1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("start");
+         
+            Task<int> task1 = Task.Run(() =>
+            {
+                    int sum = 0;
+                    for (int i = 0; i < 5; i++)
+                    {
+                        sum = sum + i;
+                    }
+                    return sum;
+            });
+
+            Console.WriteLine("Result="+task1.Result);
+
+            Console.WriteLine("end");
+            Console.ReadKey();
+        }
+    }
+} 
+Task using action Delegate:
+
+class Program
+    {
+        static void Main(string[] args)
+        {
+            var x = new Action(() => {
+                                      Console.WriteLine("action delegate");                       
+                                     });
+
+            // Task task1 = Task.Run(() => x());
+            Task task1 = new Task(() => x());
+            task1.Start();
+            task1.Wait();
+        }
+    }
+
+
+ class Program
+    {
+        static void Main(string[] args)
+        {
+            var x = new Action<int>((n) => {
+                                          for(int i=1;i<=n;i++)
+                                            {
+                                                Console.WriteLine(i);
+                                            }
+                                    });
+
+            
+            Task task1 = new Task(() => x(10));
+            task1.Start();
+            task1.Wait();
+        }
+    }
+
+
+Task with function Delegate:
+
+class Program
+    {
+        static void Main(string[] args)
+        {
+            var x = new Func<int, int>((n) => {
+                            int sum = 0;
+                            for (int i = 1; i <= n; i++)
+                            {
+                                sum = sum + i;
+                            }
+                            return sum;
+            });
+
+
+            Task<int> task1 = new Task<int>(() => { return x(10); });
+            task1.Start();
+            task1.Wait();
+            Console.WriteLine("total=" + task1.Result);
+        }
+    }
+
+namespace ConsoleApp1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var x = new Func<int, int>((n) => {
+                            int sum = 100;
+                            for (int i = 1; i <= n; i++)
+                            {
+                                sum = sum + i;
+                            }
+                            return sum;
+            });
+
+            var y = new Func<int, int>((n) => {
+                int diff = 100;
+                for (int i = 1; i <= n; i++)
+                {
+                    diff = diff - i;
+                }
+                return diff;
+            });
+
+
+            Task<int> task1 = new Task<int>(() => { return x(10); });
+            Task<int> task2 = new Task<int>(() => { return y(10); });
+            task1.Start();
+            task2.Start();
+            Task.WaitAll(new Task[] { task1 , task2});
+
+            Console.WriteLine("total sum=" + task1.Result);
+            Console.WriteLine("total diff=" + task2.Result);
+        }
+    }
+} 
+
+
+
+Icomparable and Icomparer:
+
+These interfaces are used to sort data in object,by implementing CompareTo and Compare methods.
+
+class Program
+    {
+        static void Main(string[] args)
+        {
+            string[] array1 = {"WPF","WCF","MVC","ASP.NET","VB.NET" };
+
+            Array.Sort(array1);
+
+            foreach(string i in array1)
+            {
+                Console.WriteLine(i);
+            }
+        }
+    }
+
+
+compare a,b
+0  a==b
+-1 a<b no-swap
+1  a>b swap
+
+Icomparable:
+
+namespace ConsoleApp1
+{
+    class TechDet:IComparable
+    {
+        public int tid { get; set; }
+        public string tname { get; set; }
+
+        public int CompareTo(object obj)
+        {
+            TechDet tobj = obj as TechDet;
+            if (tobj != null)
+            {
+                return this.tname.CompareTo(tobj.tname);
+            }
+            return -1;
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            //string[] array1 = {"WPF","WCF","MVC","ASP.NET","VB.NET" };
+
+            TechDet[] techarrayobj = new TechDet[] {
+                new TechDet {tid=1,tname= "WPF" },
+                new TechDet {tid=2,tname= "WCF" },
+                new TechDet {tid=3,tname= "MVC" },
+                new TechDet {tid=4, tname= "ASP.NET" }
+               };
+
+            Array.Sort(techarrayobj);
+
+            foreach(var i in techarrayobj)
+            {
+                Console.WriteLine(i.tname);
+            }
+        }
+    }
+} 
+
+Icomparer:
+
+namespace ConsoleApp1
+{
+    class TechDet:IComparable
+    {
+        public int tid { get; set; }
+        public string tname { get; set; }
+        public double tduration { get; set; }
+        public int CompareTo(object obj)
+        {
+            TechDet tobj = obj as TechDet;
+            if (tobj != null)
+            {
+                return this.tname.CompareTo(tobj.tname);
+            }
+            return -1;
+        }
+    }
+    class Durationcomparer : IComparer<TechDet>
+    {
+        public int Compare(TechDet x,TechDet y)
+        {
+            return x.tduration.CompareTo(y.tduration);
+        }
+    }
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            TechDet[] techarrayobj = new TechDet[] {
+                new TechDet {tid=1,tname= "WPF",tduration=4 },
+                new TechDet {tid=2,tname= "WCF",tduration=1 },
+                new TechDet {tid=3,tname= "MVC",tduration=3},
+                new TechDet {tid=4, tname= "ASP.NET",tduration=2 }
+               };
+            // Array.Sort(techarrayobj);
+
+            Array.Sort(techarrayobj,new Durationcomparer());
+
+            foreach (var i in techarrayobj)
+            {
+                Console.WriteLine(i.tname+"--"+i.tduration);
+            }
+        }
+    }
+} 
+
